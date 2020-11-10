@@ -7,7 +7,7 @@ const BLOG_ROOT_PATH = '.';
 export const POSTS_PATH = path.join(BLOG_ROOT_PATH, '_posts');
 
 const isNetPath = (imgPath: string) => imgPath.slice(0, 4) === 'http';
-const isBlogPath = (imgPath: string) => imgPath.startsWith('/images');
+const isBlogPath = (imgPath: string) => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
 const isLocalPath = (imgPath: string) => !isNetPath(imgPath) && !isBlogPath(imgPath);
 
 const flatten = (arr: any[]): any[] => {
@@ -76,7 +76,7 @@ const toBlogPath = (imgPath: string, postName: string) => {
 };
 
 const toLocalPath = (imgPath: string) => {
-  if (isLocalPath(imgPath)) {
+  if (isLocalPath(imgPath) || isNetPath(imgPath)) {
     return imgPath;
   }
   return path.join(__dirname, imgPath);

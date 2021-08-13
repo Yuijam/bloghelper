@@ -2,7 +2,8 @@
 
 import * as fs from 'fs';
 import path from 'path';
-import {readAllPosts, toLocalContent, POSTS_PATH} from './imageHelper';
+import {POSTS_PATH} from './config';
+import {readAllPosts, toLocalContent} from './imageHelper';
 
 const allPosts = readAllPosts();
 

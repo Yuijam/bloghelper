@@ -2,7 +2,9 @@
 
 import * as fs from 'fs';
 import path from 'path';
-import {readAllPosts, toBlogContent, POSTS_PATH} from './imageHelper';
+import {POSTS_PATH} from './config';
+
+import {readAllPosts, toBlogContent} from './imageHelper';
 
 const allPosts = readAllPosts();
 

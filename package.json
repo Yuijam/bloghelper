@@ -4,6 +4,9 @@
   "description": "",
   "main": "imageHelper.js",
   "scripts": {
+    "toblog": "ts-node src/toBlog.ts",
+    "tolocal": "ts-node src/toLocal.ts",
+    "cleanimg": "ts-node src/cleanImg.ts",
     "runtest": "ts-node ./test.ts",
     "build": "tsc"
   },
@@ -20,6 +23,8 @@
   "homepage": "https://github.com/Yuijam/bloghelper#readme",
   "dependencies": {
     "@types/node": "^14.14.6",
+    "@types/sharp": "^0.28.5",
+    "sharp": "^0.28.3",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   },

@@ -2,6 +2,7 @@
   "name": "bloghelper",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "imageHelper.js",
   "scripts": {
     "toblog": "ts-node src/toBlog.ts",

@@ -2,14 +2,15 @@
 
 import * as fs from 'fs';
 import path from 'path';
-import {POSTS_PATH} from './config';
+import config from './config.js';
 
-import {readAllPosts, toBlogContent} from './imageHelper';
+// import {readAllPosts, toBlogContent} from './imageHelper.js';
+import imageHelper from './imageHelper.js';
 
-const allPosts = readAllPosts();
+const allPosts = imageHelper.readAllPosts();
 console.log(allPosts);
 // toBlogContent
-allPosts.map(({content, postName}) => {
-  const blogContent = toBlogContent(content);
-  fs.writeFileSync(path.join(POSTS_PATH, postName), blogContent);
-});
+// allPosts.map(({content, postName}) => {
+//   const blogContent = toBlogContent(content);
+//   fs.writeFileSync(path.join(POSTS_PATH, postName), blogContent);
+// });

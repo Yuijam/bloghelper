@@ -3,16 +3,16 @@
 import * as fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
-import {POSTS_PATH, BLOG_ROOT_PATH} from './config';
-import {flatten} from './tools';
+import config from './config.js';
+import tools from './tools.js';
 
 export const isNetPath = imgPath => imgPath.slice(0, 4) === 'http';
 export const isBlogPath = imgPath => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
 export const isLocalPath = imgPath => !isNetPath(imgPath) && !isBlogPath(imgPath);
 
 export const readAllPosts = () =>
-  fs.readdirSync(POSTS_PATH).map(name => ({
-    content: fs.readFileSync(path.join(POSTS_PATH, name), 'utf8'),
+  fs.readdirSync(config.POSTS_PATH).map(name => ({
+    content: fs.readFileSync(path.join(config.POSTS_PATH, name), 'utf8'),
     postName: name,
   }));
 
@@ -25,12 +25,12 @@ export const getAllImagePaths = str => {
   }
 
   const pathReg = /\(.+\)/g; // 提取括号以及括号中内容
-  const pathsWithParentheses = flatten(imageTags.map(item => item.match(pathReg)));
+  const pathsWithParentheses = tools.flatten(imageTags.map(item => item.match(pathReg)));
   const paths = pathsWithParentheses.map(item => item.slice(1, -1));
   return paths;
 };
 
-const getPostImgDirPath = postName => path.join(BLOG_ROOT_PATH, 'images', postName);
+const getPostImgDirPath = postName => path.join(config.BLOG_ROOT_PATH, 'images', postName);
 
 const isPostImgDirExist = postName => fs.existsSync(getPostImgDirPath(postName));
 
@@ -104,7 +104,7 @@ const toLocalPath = imgPath => {
   if (isLocalPath(imgPath) || isNetPath(imgPath)) {
     return imgPath;
   }
-  return path.join(BLOG_ROOT_PATH, imgPath);
+  return path.join(config.BLOG_ROOT_PATH, imgPath);
 };
 
 const getPostTitle = content => {
@@ -134,4 +134,14 @@ export const toLocalContent = content => {
     const localPath = toLocalPath(cur);
     return localPath === cur ? acc : acc.replace(cur, localPath);
   }, content);
+};
+
+export default {
+  isNetPath,
+  isBlogPath,
+  isLocalPath,
+  readAllPosts,
+  getAllImagePaths,
+  toBlogContent,
+  toLocalContent,
 };

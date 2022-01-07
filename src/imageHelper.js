@@ -6,17 +6,17 @@ import sharp from 'sharp';
 import config from './config.js';
 import tools from './tools.js';
 
-export const isNetPath = imgPath => imgPath.slice(0, 4) === 'http';
-export const isBlogPath = imgPath => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
-export const isLocalPath = imgPath => !isNetPath(imgPath) && !isBlogPath(imgPath);
+const isNetPath = imgPath => imgPath.slice(0, 4) === 'http';
+const isBlogPath = imgPath => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
+const isLocalPath = imgPath => !isNetPath(imgPath) && !isBlogPath(imgPath);
 
-export const readAllPosts = () =>
+const readAllPosts = () =>
   fs.readdirSync(config.POSTS_PATH).map(name => ({
     content: fs.readFileSync(path.join(config.POSTS_PATH, name), 'utf8'),
     postName: name,
   }));
 
-export const getAllImagePaths = str => {
+const getAllImagePaths = str => {
   const imageTagsReg = /\!\[.*?\].*?(png|jpg|webp|jpeg|gif)\)/gi; // 问号一个不能少，表示非贪心
   const imageTags = str.match(imageTagsReg);
 
@@ -119,7 +119,7 @@ const getPostTitle = content => {
   return titleTag.split(':')[1].trim();
 };
 
-export const toBlogContent = content => {
+const toBlogContent = content => {
   const allImagePaths = getAllImagePaths(content);
   return allImagePaths.reduce((acc, cur) => {
     const postName = getPostTitle(content);
@@ -128,7 +128,7 @@ export const toBlogContent = content => {
   }, content);
 };
 
-export const toLocalContent = content => {
+const toLocalContent = content => {
   const allImagePaths = getAllImagePaths(content);
   return allImagePaths.reduce((acc, cur) => {
     const localPath = toLocalPath(cur);

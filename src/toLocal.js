@@ -1,3 +1,5 @@
+/** @format */
+
 import * as fs from 'fs';
 import path from 'path';
 import {POSTS_PATH} from './config';

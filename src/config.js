@@ -1,6 +1,8 @@
+/** @format */
+
 import path from 'path';
 
-export const BLOG_ROOT_PATH = 'D://code/blog/type-theme-master';
+export const BLOG_ROOT_PATH = '/Users/yuijam/Documents/yuijam.github.io';
 export const POSTS_PATH = path.join(BLOG_ROOT_PATH, '_posts');
 export const IMAGE_PATH = path.join(BLOG_ROOT_PATH, 'images');
 export const EXCEPT_PATH = [

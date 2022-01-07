@@ -7,7 +7,7 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: ['plugin:@typescript-eslint/recommended', 'prettier/@typescript-eslint', 'plugin:prettier/recommended'],
+  extends: ['plugin:prettier/recommended'],
   rules: {
     'no-dupe-keys': 'error',
     'no-duplicate-case': 'error',
@@ -19,5 +19,6 @@ module.exports = {
   },
   parserOptions: {
     parser: '@typescript-eslint/parser',
+    sourceType: 'module',
   },
 };

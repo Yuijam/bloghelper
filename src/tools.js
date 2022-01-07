@@ -1,3 +1,5 @@
+/** @format */
+
 import * as fs from 'fs';
 import path from 'path';
 
@@ -19,7 +21,7 @@ export const getAllPath = (dirname, exceptArr) => {
   return subDirArr;
 };
 
-export const flatten = (arr) => {
+export const flatten = arr => {
   const newArr = [].concat(...arr);
   return newArr.some(Array.isArray) ? flatten(newArr) : newArr;
 };

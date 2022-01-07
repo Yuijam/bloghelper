@@ -1,12 +1,14 @@
+/** @format */
+
 import * as fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import {POSTS_PATH, BLOG_ROOT_PATH} from './config';
 import {flatten} from './tools';
 
-export const isNetPath = (imgPath) => imgPath.slice(0, 4) === 'http';
-export const isBlogPath = (imgPath) => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
-export const isLocalPath = (imgPath) => !isNetPath(imgPath) && !isBlogPath(imgPath);
+export const isNetPath = imgPath => imgPath.slice(0, 4) === 'http';
+export const isBlogPath = imgPath => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
+export const isLocalPath = imgPath => !isNetPath(imgPath) && !isBlogPath(imgPath);
 
 export const readAllPosts = () =>
   fs.readdirSync(POSTS_PATH).map(name => ({
@@ -14,8 +16,8 @@ export const readAllPosts = () =>
     postName: name,
   }));
 
-export const getAllImagePaths = (str) => {
-  const imageTagsReg = /\!\[.*?\].*?(png|jpg|webp)\)/gi; // 问号一个不能少，表示非贪心
+export const getAllImagePaths = str => {
+  const imageTagsReg = /\!\[.*?\].*?(png|jpg|webp|jpeg|gif)\)/gi; // 问号一个不能少，表示非贪心
   const imageTags = str.match(imageTagsReg);
 
   if (!imageTags) {
@@ -28,9 +30,9 @@ export const getAllImagePaths = (str) => {
   return paths;
 };
 
-const getPostImgDirPath = (postName) => path.join(BLOG_ROOT_PATH, 'images', postName);
+const getPostImgDirPath = postName => path.join(BLOG_ROOT_PATH, 'images', postName);
 
-const isPostImgDirExist = (postName) => fs.existsSync(getPostImgDirPath(postName));
+const isPostImgDirExist = postName => fs.existsSync(getPostImgDirPath(postName));
 
 const isPostImgExistInDir = (imgPath, postName) => fs.existsSync(toPostImgPath(imgPath, postName));
 
@@ -50,9 +52,9 @@ const toPostImgBlogPath = (imgPath, postName) => {
   return res[0];
 };
 
-const isWebp = (imgPath) => imgPath.slice(-4) === '.webp';
+const isWebp = imgPath => imgPath.slice(-4) === '.webp';
 
-const webpQulity = (fileSizeInBytes) => {
+const webpQulity = fileSizeInBytes => {
   const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
   if (fileSizeInMegabytes > 2) {
     return 20;
@@ -98,14 +100,14 @@ const toBlogPath = (imgPath, postName) => {
   return toPostImgBlogPath(imgPath, postName);
 };
 
-const toLocalPath = (imgPath) => {
+const toLocalPath = imgPath => {
   if (isLocalPath(imgPath) || isNetPath(imgPath)) {
     return imgPath;
   }
   return path.join(BLOG_ROOT_PATH, imgPath);
 };
 
-const getPostTitle = (content) => {
+const getPostTitle = content => {
   const headerTag = '---';
   const start = content.indexOf(headerTag);
   const end = content.indexOf(headerTag, start + headerTag.length);
@@ -117,7 +119,7 @@ const getPostTitle = (content) => {
   return titleTag.split(':')[1].trim();
 };
 
-export const toBlogContent = (content) => {
+export const toBlogContent = content => {
   const allImagePaths = getAllImagePaths(content);
   return allImagePaths.reduce((acc, cur) => {
     const postName = getPostTitle(content);
@@ -126,7 +128,7 @@ export const toBlogContent = (content) => {
   }, content);
 };
 
-export const toLocalContent = (content) => {
+export const toLocalContent = content => {
   const allImagePaths = getAllImagePaths(content);
   return allImagePaths.reduce((acc, cur) => {
     const localPath = toLocalPath(cur);

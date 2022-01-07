@@ -7,7 +7,7 @@ const content = fs.readFileSync('./2020-02-24-双缝干涉实验.md', 'utf8');
 // const start = content.indexOf('---');
 const str = content.substring(3, 10);
 // const res = content.match(/---.*---/g);
-const getAllIndexOf = (s: string, t: string) => {
+const getAllIndexOf = (s, t) => {
   const start = s.indexOf(t);
   const end = s.indexOf(t, start + t.length);
   return [start, end];

@@ -1,5 +1,3 @@
-/** @format */
-
 import path from 'path';
 
 export const BLOG_ROOT_PATH = 'D://code/blog/type-theme-master';

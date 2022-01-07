@@ -1,14 +1,12 @@
-/** @format */
-
 import * as fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import {POSTS_PATH, BLOG_ROOT_PATH} from './config';
 import {flatten} from './tools';
 
-export const isNetPath = (imgPath: string) => imgPath.slice(0, 4) === 'http';
-export const isBlogPath = (imgPath: string) => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
-export const isLocalPath = (imgPath: string) => !isNetPath(imgPath) && !isBlogPath(imgPath);
+export const isNetPath = (imgPath) => imgPath.slice(0, 4) === 'http';
+export const isBlogPath = (imgPath) => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
+export const isLocalPath = (imgPath) => !isNetPath(imgPath) && !isBlogPath(imgPath);
 
 export const readAllPosts = () =>
   fs.readdirSync(POSTS_PATH).map(name => ({
@@ -16,7 +14,7 @@ export const readAllPosts = () =>
     postName: name,
   }));
 
-export const getAllImagePaths = (str: string) => {
+export const getAllImagePaths = (str) => {
   const imageTagsReg = /\!\[.*?\].*?(png|jpg|webp)\)/gi; // 问号一个不能少，表示非贪心
   const imageTags = str.match(imageTagsReg);
 
@@ -30,20 +28,20 @@ export const getAllImagePaths = (str: string) => {
   return paths;
 };
 
-const getPostImgDirPath = (postName: string) => path.join(BLOG_ROOT_PATH, 'images', postName);
+const getPostImgDirPath = (postName) => path.join(BLOG_ROOT_PATH, 'images', postName);
 
-const isPostImgDirExist = (postName: string) => fs.existsSync(getPostImgDirPath(postName));
+const isPostImgDirExist = (postName) => fs.existsSync(getPostImgDirPath(postName));
 
-const isPostImgExistInDir = (imgPath: string, postName: string) => fs.existsSync(toPostImgPath(imgPath, postName));
+const isPostImgExistInDir = (imgPath, postName) => fs.existsSync(toPostImgPath(imgPath, postName));
 
-const toPostImgPath = (originPath: string, postName: string) => {
+const toPostImgPath = (originPath, postName) => {
   const filename = path.basename(originPath);
   const idx = filename.lastIndexOf('.');
   const realFilename = filename.slice(0, idx);
   return path.join(getPostImgDirPath(postName), realFilename + '.webp');
 };
 
-const toPostImgBlogPath = (imgPath: string, postName: string) => {
+const toPostImgBlogPath = (imgPath, postName) => {
   const res = toPostImgPath(imgPath, postName).match(/.images.*/g);
   if (!res) {
     console.log(`${imgPath}, ${postName}: image blog path convert failed`);
@@ -52,9 +50,9 @@ const toPostImgBlogPath = (imgPath: string, postName: string) => {
   return res[0];
 };
 
-const isWebp = (imgPath: string) => imgPath.slice(-4) === '.webp';
+const isWebp = (imgPath) => imgPath.slice(-4) === '.webp';
 
-const webpQulity = (fileSizeInBytes: number) => {
+const webpQulity = (fileSizeInBytes) => {
   const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
   if (fileSizeInMegabytes > 2) {
     return 20;
@@ -62,7 +60,7 @@ const webpQulity = (fileSizeInBytes: number) => {
   return 80;
 };
 
-const moveFileToPostImgDir = (imgPath: string, postName: string) => {
+const moveFileToPostImgDir = (imgPath, postName) => {
   console.log(imgPath, postName);
   if (!fs.existsSync(imgPath)) {
     throw `${imgPath} is not exist!`;
@@ -89,7 +87,7 @@ const moveFileToPostImgDir = (imgPath: string, postName: string) => {
     });
 };
 
-const toBlogPath = (imgPath: string, postName: string) => {
+const toBlogPath = (imgPath, postName) => {
   if (!isLocalPath(imgPath)) {
     return imgPath;
   }
@@ -100,14 +98,14 @@ const toBlogPath = (imgPath: string, postName: string) => {
   return toPostImgBlogPath(imgPath, postName);
 };
 
-const toLocalPath = (imgPath: string) => {
+const toLocalPath = (imgPath) => {
   if (isLocalPath(imgPath) || isNetPath(imgPath)) {
     return imgPath;
   }
   return path.join(BLOG_ROOT_PATH, imgPath);
 };
 
-const getPostTitle = (content: string) => {
+const getPostTitle = (content) => {
   const headerTag = '---';
   const start = content.indexOf(headerTag);
   const end = content.indexOf(headerTag, start + headerTag.length);
@@ -119,7 +117,7 @@ const getPostTitle = (content: string) => {
   return titleTag.split(':')[1].trim();
 };
 
-export const toBlogContent = (content: string) => {
+export const toBlogContent = (content) => {
   const allImagePaths = getAllImagePaths(content);
   return allImagePaths.reduce((acc, cur) => {
     const postName = getPostTitle(content);
@@ -128,7 +126,7 @@ export const toBlogContent = (content: string) => {
   }, content);
 };
 
-export const toLocalContent = (content: string) => {
+export const toLocalContent = (content) => {
   const allImagePaths = getAllImagePaths(content);
   return allImagePaths.reduce((acc, cur) => {
     const localPath = toLocalPath(cur);

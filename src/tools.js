@@ -1,11 +1,7 @@
-/** @format */
-
 import * as fs from 'fs';
 import path from 'path';
 
-type DeepArray<T> = (T | DeepArray<T>)[];
-
-export const getAllPath = (dirname: string, exceptArr?: string[]): DeepArray<string> => {
+export const getAllPath = (dirname, exceptArr) => {
   const dirArr = fs.readdirSync(dirname);
   const subDirArr = dirArr.map(relativePath => {
     const tmpPath = path.join(dirname, relativePath);
@@ -23,7 +19,7 @@ export const getAllPath = (dirname: string, exceptArr?: string[]): DeepArray<str
   return subDirArr;
 };
 
-export const flatten = (arr: any[]): any[] => {
+export const flatten = (arr) => {
   const newArr = [].concat(...arr);
   return newArr.some(Array.isArray) ? flatten(newArr) : newArr;
 };

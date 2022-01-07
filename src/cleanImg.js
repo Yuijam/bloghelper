@@ -1,5 +1,3 @@
-/** @format */
-
 import * as fs from 'fs';
 import path from 'path';
 import {POSTS_PATH, IMAGE_PATH, BLOG_ROOT_PATH, EXCEPT_PATH} from './config';

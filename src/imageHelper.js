@@ -151,6 +151,8 @@ const toBlogContent = async content => {
   // 以防忘记
   // 这里主要是有个时候图片的alt里面的内容太复杂的话，解析会有问题，他有可能不会解析成img标签
   // 图片就无法显示，所以干脆alt里的内容全部清空掉
+  // 解释下下面两行，首先re会匹配到一个图片字符串的前面和后面两部分，需要的是把前面那部分[]中的内容置空
+  // $2表示匹配到的后面那部分，这里原封不动的返回
   const removeImgAltRe = /(!\[.*\])(\(.*\))/g;
   res = res.replaceAll(removeImgAltRe, '![]$2');
   return res;

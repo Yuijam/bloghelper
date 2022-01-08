@@ -1,7 +1,7 @@
 /** @format */
 
 import * as fs from 'fs';
-import path from 'path';
+import path, {resolve} from 'path';
 import sharp from 'sharp';
 import config from './config.js';
 import tools from './tools.js';
@@ -16,17 +16,24 @@ const readAllPosts = () =>
     postName: name,
   }));
 
-const getAllImagePaths = str => {
-  const imageTagsReg = /\!\[.*?\].*?(png|jpg|webp|jpeg|gif)\)/gi; // 问号一个不能少，表示非贪心
-  const imageTags = str.match(imageTagsReg);
-
-  if (!imageTags) {
-    return [];
+const execImgRe = (re, str) => {
+  const paths = [];
+  while (true) {
+    const res = re.exec(str);
+    if (res && res[1]) {
+      paths.push(res[1]);
+    } else {
+      break;
+    }
   }
+  return paths;
+};
+const getAllImagePaths = str => {
+  const re = /!\[.*\]\((.*)\)/g;
+  const re1 = /<img src="(.*?)".*\/>/g;
 
-  const pathReg = /\(.+\)/g; // 提取括号以及括号中内容
-  const pathsWithParentheses = tools.flatten(imageTags.map(item => item.match(pathReg)));
-  const paths = pathsWithParentheses.map(item => item.slice(1, -1));
+  const reArr = [re, re1];
+  const paths = reArr.flatMap(r => execImgRe(r, str));
   return paths;
 };
 
@@ -43,16 +50,9 @@ const toPostImgPath = (originPath, postName) => {
   return path.join(getPostImgDirPath(postName), realFilename + '.webp');
 };
 
-const toPostImgBlogPath = (imgPath, postName) => {
-  const res = toPostImgPath(imgPath, postName).match(/.images.*/g);
-  if (!res) {
-    console.log(`${imgPath}, ${postName}: image blog path convert failed`);
-    return '';
-  }
-  return res[0];
-};
+const toPostImgBlogPath = imgPath => imgPath.replace(config.BLOG_ROOT_PATH, '');
 
-const isWebp = imgPath => imgPath.slice(-4) === '.webp';
+const isWebp = imgPath => imgPath.match(/.webp$/gi);
 
 const webpQulity = fileSizeInBytes => {
   const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
@@ -62,10 +62,9 @@ const webpQulity = fileSizeInBytes => {
   return 80;
 };
 
-const moveFileToPostImgDir = (imgPath, postName) => {
-  console.log(imgPath, postName);
+const moveFileToPostImgDir = async (imgPath, postName) => {
   if (!fs.existsSync(imgPath)) {
-    throw `${imgPath} is not exist!`;
+    throw `${postName}: ${imgPath} is not exist!`;
   }
 
   if (!isPostImgDirExist(postName)) {
@@ -81,57 +80,91 @@ const moveFileToPostImgDir = (imgPath, postName) => {
   const stats = fs.statSync(imgPath);
   // Convert the file size to megabytes (optional)
   const fileSizeInMegabytes = stats.size / (1024 * 1024);
-  sharp(imgPath)
-    .webp({quality: webpQulity(fileSizeInMegabytes)})
-    .toFile(newImgPath) // 记住了，不能在生成webp图片的时候，删除掉原来的图，如果是原本就在images下的还好，如果是博客目录之外的就会删掉原图
-    .catch(function (err) {
-      console.log(err);
-    });
+  try {
+    await sharp(imgPath)
+      .webp({quality: webpQulity(fileSizeInMegabytes)})
+      .toFile(newImgPath); //记住了，不能在生成webp图片的时候，删除掉原来的图，如果是原本就在images下的还好，如果是博客目录之外的就会删掉原图
+  } catch (err) {
+    console.log(`Error on to webp: imgPath = ${imgPath}, postName = ${postName} newImgPath = ${newImgPath}, ${err}`);
+  }
+  return newImgPath;
 };
 
-const toBlogPath = (imgPath, postName) => {
+const toBlogPath = async (imgPath, postName) => {
   if (!isLocalPath(imgPath)) {
     return imgPath;
   }
 
   if (!isWebp(imgPath)) {
-    moveFileToPostImgDir(imgPath, postName);
+    const newPath = await moveFileToPostImgDir(imgPath, postName);
+    return toPostImgBlogPath(newPath);
   }
-  return toPostImgBlogPath(imgPath, postName);
+
+  return toPostImgBlogPath(imgPath);
 };
+
+const isPosixPath = p => p.includes('/');
 
 const toLocalPath = imgPath => {
   if (isLocalPath(imgPath) || isNetPath(imgPath)) {
     return imgPath;
   }
+
+  if (!isPosixPath(imgPath)) {
+    imgPath = imgPath.split('\\').join('/');
+  }
+
   return path.join(config.BLOG_ROOT_PATH, imgPath);
 };
 
 const getPostTitle = content => {
-  const headerTag = '---';
-  const start = content.indexOf(headerTag);
-  const end = content.indexOf(headerTag, start + headerTag.length);
-  const header = content.substring(start + headerTag.length, end);
-  const titleTag = header.split('\n').find(str => str.includes('title'));
-  if (!titleTag) {
-    throw `title not found!${content.substring(0, 30)}`;
+  const re = /---[\s\S]*title:(.*)[\s\S]*---/;
+  const res = re.exec(content);
+  if (res) {
+    if (res[1]) {
+      return res[1].trim();
+    } else {
+      throw `check the title of ${content.substring(0, 30)}`;
+    }
   }
-  return titleTag.split(':')[1].trim();
+  throw `title not found ${content.substring(0, 30)}`;
 };
 
-const toBlogContent = content => {
+const toBlogContent = async content => {
   const allImagePaths = getAllImagePaths(content);
-  return allImagePaths.reduce((acc, cur) => {
-    const postName = getPostTitle(content);
-    const blogPath = toBlogPath(cur, postName);
-    return acc.replace(cur, blogPath);
-  }, content);
+  if (allImagePaths.length === 0) {
+    return content;
+  }
+
+  const postName = getPostTitle(content);
+  const newPathsPromise = allImagePaths.map(async cur => await toBlogPath(cur, postName));
+  const newPaths = await Promise.all(newPathsPromise);
+  let res = content;
+  allImagePaths.map((path, index) => {
+    const newPath = newPaths[index];
+    if (!newPath) {
+      throw `${path} newPath not exist`;
+    }
+    res = res.replace(path, newPath);
+  });
+
+  // 以防忘记
+  // 这里主要是有个时候图片的alt里面的内容太复杂的话，解析会有问题，他有可能不会解析成img标签
+  // 图片就无法显示，所以干脆alt里的内容全部清空掉
+  const removeImgAltRe = /(!\[.*\])(\(.*\))/g;
+  res = res.replaceAll(removeImgAltRe, '![]$2');
+  return res;
 };
 
 const toLocalContent = content => {
   const allImagePaths = getAllImagePaths(content);
+  if (allImagePaths.length === 0) {
+    return content;
+  }
+
   return allImagePaths.reduce((acc, cur) => {
     const localPath = toLocalPath(cur);
+    // console.log(localPath);
     return localPath === cur ? acc : acc.replace(cur, localPath);
   }, content);
 };

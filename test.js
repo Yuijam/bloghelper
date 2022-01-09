@@ -1,6 +1,6 @@
 /** @format */
 
-// import * as fs from 'fs';
+import * as fs from 'fs';
 // import path from 'path';
 
 // const content = fs.readFileSync('./2020-02-24-双缝干涉实验.md', 'utf8');
@@ -66,3 +66,17 @@
 // // console.log(ress);
 // const rrr = content.replaceAll(re, '![]$2');
 // console.log(rrr);
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+const p = '/Users/yuijam/Library/Application%20Support/marktext/images/2022-01-09-11-53-39-image.png';
+const p1 = decodeURI(p);
+console.log(p1);
+const re = fs.existsSync(p1);
+console.log(re);

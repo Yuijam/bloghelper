@@ -63,6 +63,8 @@ const webpQulity = fileSizeInBytes => {
 };
 
 const moveFileToPostImgDir = async (imgPath, postName) => {
+  // decodeURI 用来处理有目录的路径，有个时候会出现%20这样的字符串，这种路径无法成功读取
+  imgPath = decodeURI(imgPath);
   if (!fs.existsSync(imgPath)) {
     throw `${postName}: ${imgPath} is not exist!`;
   }

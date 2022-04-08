@@ -12,10 +12,13 @@ const isBlogPath = imgPath => imgPath.startsWith('/images') || imgPath.startsWit
 const isLocalPath = imgPath => !isNetPath(imgPath) && !isBlogPath(imgPath);
 
 const readAllPosts = () =>
-  fs.readdirSync(config.POSTS_PATH).map(name => ({
-    content: fs.readFileSync(path.join(config.POSTS_PATH, name), 'utf8'),
-    postName: name,
-  }));
+  fs
+    .readdirSync(config.POSTS_PATH)
+    .filter(name => !name.startsWith('.'))
+    .map(name => ({
+      content: fs.readFileSync(path.join(config.POSTS_PATH, name), 'utf8'),
+      postName: name,
+    }));
 
 const execImgRe = (re, str) => {
   const paths = [];

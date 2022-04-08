@@ -4,6 +4,7 @@ import path from 'path';
 
 const BLOG_ROOT_PATH = '/Users/yuijam/code/blog';
 const POSTS_PATH = path.join(BLOG_ROOT_PATH, 'posts');
+const IMAGE_ROOT_PATH = path.join(BLOG_ROOT_PATH, 'public');
 const IMAGE_PATH = path.join(BLOG_ROOT_PATH, 'images');
 const EXCEPT_PATH = [
   path.join(BLOG_ROOT_PATH, 'images', 'about'),
@@ -17,4 +18,5 @@ export default {
   POSTS_PATH,
   IMAGE_PATH,
   EXCEPT_PATH,
+  IMAGE_ROOT_PATH,
 };

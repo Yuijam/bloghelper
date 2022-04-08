@@ -50,7 +50,7 @@ const toPostImgPath = (originPath, postName) => {
   return path.join(getPostImgDirPath(postName), realFilename + '.webp');
 };
 
-const toPostImgBlogPath = imgPath => imgPath.replace(config.BLOG_ROOT_PATH, '');
+const toPostImgBlogPath = imgPath => imgPath.replace(config.IMAGE_ROOT_PATH, '');
 
 const isWebp = imgPath => imgPath.match(/.webp$/gi);
 
@@ -115,8 +115,7 @@ const toLocalPath = imgPath => {
   if (!isPosixPath(imgPath)) {
     imgPath = imgPath.split('\\').join('/');
   }
-
-  return path.join(config.BLOG_ROOT_PATH, imgPath);
+  return path.join(config.IMAGE_ROOT_PATH, imgPath);
 };
 
 const getPostTitle = content => {

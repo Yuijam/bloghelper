@@ -5,6 +5,7 @@ import path, {resolve} from 'path';
 import sharp from 'sharp';
 import config from './config.js';
 import tools from './tools.js';
+import matter from 'gray-matter';
 
 const isNetPath = imgPath => imgPath.slice(0, 4) === 'http';
 const isBlogPath = imgPath => imgPath.startsWith('/images') || imgPath.startsWith('\\images');
@@ -37,7 +38,7 @@ const getAllImagePaths = str => {
   return paths;
 };
 
-const getPostImgDirPath = postName => path.join(config.BLOG_ROOT_PATH, 'images', postName);
+const getPostImgDirPath = postName => path.join(config.IMAGE_ROOT_PATH, 'images', postName);
 
 const isPostImgDirExist = postName => fs.existsSync(getPostImgDirPath(postName));
 
@@ -64,6 +65,8 @@ const webpQulity = fileSizeInBytes => {
 
 const moveFileToPostImgDir = async (imgPath, postName) => {
   // decodeURI 用来处理有目录的路径，有个时候会出现%20这样的字符串，这种路径无法成功读取
+  console.log('postName', postName);
+  console.log('imagepath', imgPath);
   imgPath = decodeURI(imgPath);
   if (!fs.existsSync(imgPath)) {
     throw `${postName}: ${imgPath} is not exist!`;
@@ -119,16 +122,9 @@ const toLocalPath = imgPath => {
 };
 
 const getPostTitle = content => {
-  const re = /---[\s\S]*title:(.*)[\s\S]*---/;
-  const res = re.exec(content);
-  if (res) {
-    if (res[1]) {
-      return res[1].trim();
-    } else {
-      throw `check the title of ${content.substring(0, 30)}`;
-    }
-  }
-  throw `title not found ${content.substring(0, 30)}`;
+  const matterResult = matter(content);
+  const data = matterResult.data;
+  return data.title.replace('/', '-');
 };
 
 const toBlogContent = async content => {

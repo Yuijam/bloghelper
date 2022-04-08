@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Yuijam/bloghelper#readme",
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "sharp": "^0.28.3"
   },
   "devDependencies": {

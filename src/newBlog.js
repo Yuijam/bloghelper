@@ -14,19 +14,25 @@ const header = `---
 layout: post
 title: INPUT_TITLE
 tags: [INPUT_TAGS]
+date: 'DATE'
 ---
 `;
 
 const getFilename = title => {
-  const d = new Date();
-  const year = d.getFullYear();
-  const month = d.getMonth() + 1;
-  const day = d.getDate();
   const newTitle = title.trim().replaceAll(/\s+/g, '-');
-  return `${year}-${month}-${day}-${newTitle}.md`;
+  return `${newTitle}.md`;
 };
 
-const getFileHeader = (title, tags) => header.replace('INPUT_TITLE', title.trim()).replace('INPUT_TAGS', tags);
+const getDateStr = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getFileHeader = (title, tags) =>
+  header.replace('INPUT_TITLE', title.trim()).replace('INPUT_TAGS', tags).replace('DATE', getDateStr());
 
 rl.question(`Input The Title: \n`, title => {
   const filename = getFilename(title);

@@ -12,14 +12,14 @@ const rl = readline.createInterface({
 
 const header = `---
 layout: post
-title: INPUT_TITLE
+title: 'INPUT_TITLE'
 tags: [INPUT_TAGS]
 date: 'DATE'
 ---
 `;
 
 const getFilename = title => {
-  const newTitle = title.trim().replaceAll(/\s+/g, '-');
+  const newTitle = title.trim().replaceAll(/[\s+\/]/g, '-');
   return `${newTitle}.md`;
 };
 

@@ -68,8 +68,6 @@ const webpQulity = fileSizeInBytes => {
 
 const moveFileToPostImgDir = async (imgPath, postName) => {
   // decodeURI 用来处理有目录的路径，有个时候会出现%20这样的字符串，这种路径无法成功读取
-  console.log('postName', postName);
-  console.log('imagepath', imgPath);
   imgPath = decodeURI(imgPath);
   if (!fs.existsSync(imgPath)) {
     throw `${postName}: ${imgPath} is not exist!`;
@@ -136,7 +134,9 @@ const toBlogContent = async content => {
     return content;
   }
 
-  const postName = getPostTitle(content);
+  const postName = getPostTitle(content)
+    .trim()
+    .replaceAll(/[\s+\/]/g, '-');
   const newPathsPromise = allImagePaths.map(async cur => await toBlogPath(cur, postName));
   const newPaths = await Promise.all(newPathsPromise);
   let res = content;
